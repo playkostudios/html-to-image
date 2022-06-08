@@ -1,7 +1,6 @@
 import { Options } from './options'
-import { getBlobFromURL } from './getBlobFromURL'
 import { clonePseudoElements } from './clonePseudoElements'
-import { createImage, getMimeType, makeDataUrl, toArray } from './util'
+import { createImage, toArray } from './util'
 
 async function cloneCanvasElement(node: HTMLCanvasElement) {
   const dataURL = node.toDataURL()
@@ -13,11 +12,16 @@ async function cloneCanvasElement(node: HTMLCanvasElement) {
 }
 
 async function cloneVideoElement(node: HTMLVideoElement, options: Options) {
-  return Promise.resolve(node.poster)
-    .then((url) => getBlobFromURL(url, options))
-    .then((data) =>
-      makeDataUrl(data.blob, getMimeType(node.poster) || data.contentType),
-    )
+  return Promise.resolve(node)
+    .then((node) => {
+      const canvas = document.createElement('canvas')
+      canvas.width = node.width // TODO right dimensions
+      canvas.height = node.height
+      const context = canvas.getContext('2d')
+      if (context === null) throw 'oh no'
+      context.drawImage(node, 0, 0)
+      return canvas.toDataURL()
+    })
     .then((dataURL) => createImage(dataURL))
 }
 
@@ -29,7 +33,8 @@ async function cloneSingleNode<T extends HTMLElement>(
     return cloneCanvasElement(node)
   }
 
-  if (node instanceof HTMLVideoElement && node.poster) {
+  if (node instanceof HTMLVideoElement) {
+    // TODO load poster
     return cloneVideoElement(node, options)
   }
 
