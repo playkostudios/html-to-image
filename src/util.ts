@@ -101,8 +101,14 @@ export function toArray<T>(arrayLike: any): T[] {
 }
 
 function px(node: HTMLElement, styleProperty: string) {
-  const val = window.getComputedStyle(node).getPropertyValue(styleProperty)
-  return parseFloat(val.replace('px', ''))
+  const val = parseFloat(
+    window
+      .getComputedStyle(node)
+      .getPropertyValue(styleProperty)
+      .replace('px', ''),
+  )
+
+  return Number.isNaN(val) ? 0 : val
 }
 
 export function getNodeWidth(node: HTMLElement) {
@@ -115,6 +121,20 @@ export function getNodeHeight(node: HTMLElement) {
   const topBorder = px(node, 'border-top-width')
   const bottomBorder = px(node, 'border-bottom-width')
   return node.clientHeight + topBorder + bottomBorder
+}
+
+export function getMarginedNodeWidth(node: HTMLElement) {
+  const nodeWidth = getNodeWidth(node)
+  const leftMargin = px(node, 'margin-left')
+  const rightMargin = px(node, 'margin-right')
+  return nodeWidth + leftMargin + rightMargin
+}
+
+export function getMarginedNodeHeight(node: HTMLElement) {
+  const nodeHeight = getNodeHeight(node)
+  const topMargin = px(node, 'margin-top')
+  const bottomMargin = px(node, 'margin-bottom')
+  return nodeHeight + topMargin + bottomMargin
 }
 
 export function getPixelRatio() {
