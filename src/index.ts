@@ -4,8 +4,8 @@ import { embedImages } from './embedImages'
 import { applyStyleWithOptions } from './applyStyleWithOptions'
 import { embedWebFonts, getWebFontCSS } from './embedWebFonts'
 import {
-  getNodeWidth,
-  getNodeHeight,
+  getMarginedNodeWidth,
+  getMarginedNodeHeight,
   getPixelRatio,
   createImage,
   canvasToBlob,
@@ -13,8 +13,8 @@ import {
 } from './util'
 
 function getImageSize(node: HTMLElement, options: Options = {}) {
-  const width = options.width || getNodeWidth(node)
-  const height = options.height || getNodeHeight(node)
+  const width = options.width || getMarginedNodeWidth(node)
+  const height = options.height || getMarginedNodeHeight(node)
 
   return { width, height }
 }
