@@ -86,4 +86,9 @@ export interface Options {
    *
    */
   fetchRequestInit?: RequestInit
+  /**
+   * If true, input and textarea elements will be replaced with a fake version
+   * where the caret is visible, with text scrolled to follow the caret
+   */
+  fakeTextInputs?: boolean
 }

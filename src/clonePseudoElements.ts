@@ -22,13 +22,14 @@ function getPseudoElementStyle(
   className: string,
   pseudo: Pseudo,
   style: CSSStyleDeclaration,
+  ownerDoc: HTMLDocument,
 ): Text {
   const selector = `.${className}:${pseudo}`
   const cssText = style.cssText
     ? formatCSSText(style)
     : formatCSSProperties(style)
 
-  return document.createTextNode(`${selector}{${cssText}}`)
+  return ownerDoc.createTextNode(`${selector}{${cssText}}`)
 }
 
 function clonePseudoElement<T extends HTMLElement>(
@@ -36,7 +37,18 @@ function clonePseudoElement<T extends HTMLElement>(
   clonedNode: T,
   pseudo: Pseudo,
 ) {
-  const style = window.getComputedStyle(nativeNode, pseudo)
+  const ownerDoc = nativeNode?.ownerDocument
+
+  if (!ownerDoc) {
+    return
+  }
+
+  const style = ownerDoc?.defaultView?.getComputedStyle(nativeNode, pseudo)
+
+  if (!style) {
+    return
+  }
+
   const content = style.getPropertyValue('content')
   if (content === '' || content === 'none') {
     return
@@ -50,8 +62,10 @@ function clonePseudoElement<T extends HTMLElement>(
     return
   }
 
-  const styleElement = document.createElement('style')
-  styleElement.appendChild(getPseudoElementStyle(className, pseudo, style))
+  const styleElement = ownerDoc.createElement('style')
+  styleElement.appendChild(
+    getPseudoElementStyle(className, pseudo, style, ownerDoc),
+  )
   clonedNode.appendChild(styleElement)
 }
 
